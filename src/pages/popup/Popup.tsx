@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import logo from "@assets/img/logo.svg";
 import "@pages/popup/Popup.css";
+import { captureScreenShot } from "@src/chrome/service/Capture";
 
 const Popup = () => {
+  // const port = chrome.runtime.connect({ name: "popup" });
+
   return (
     <div className="App">
       <header className="App-header">
@@ -10,15 +13,9 @@ const Popup = () => {
         <p>
           Edit <code>src/pages/popup/Popup.tsx</code> and save to reload.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React!
-        </a>
       </header>
+      <h1>Hello world!</h1>
+      <button>Capture</button>
     </div>
   );
 };

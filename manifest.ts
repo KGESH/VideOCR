@@ -20,18 +20,29 @@ const manifest: chrome.runtime.ManifestV3 = {
   chrome_url_overrides: {
     newtab: "src/pages/newtab/index.html",
   },
+  permissions: ["desktopCapture", "tabs", "activeTab", "downloads"],
+  host_permissions: ["<all_urls>"],
   icons: {
     "128": "icon-128.png",
   },
   content_scripts: [
     {
-      matches: ["http://*/*", "https://*/*", "<all_urls>"],
+      matches: ["<all_urls>"],
       js: ["src/pages/content/index.js"],
       // KEY for cache invalidation
       css: ["assets/css/contentStyle<KEY>.chunk.css"],
     },
   ],
   devtools_page: "src/pages/devtools/index.html",
+  commands: {
+    capture_screenshot: {
+      suggested_key: {
+        default: "Ctrl+Shift+Y",
+        mac: "Command+Shift+S",
+      },
+      description: "Capture screenshot short cut",
+    },
+  },
   web_accessible_resources: [
     {
       resources: [
