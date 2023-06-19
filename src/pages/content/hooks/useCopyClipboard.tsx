@@ -1,6 +1,7 @@
 import { DependencyList, useEffect, useState } from "react";
 
 type ContentType = "image" | "text";
+
 export function useCopyClipboard(copiedResetEffectDeps?: DependencyList) {
   const [isCopied, setIsCopied] = useState(false);
 
@@ -9,7 +10,16 @@ export function useCopyClipboard(copiedResetEffectDeps?: DependencyList) {
   }, copiedResetEffectDeps);
 
   const copy = async (content: string, contentType: ContentType) => {
-    await copyToClipboard(content);
+    switch (contentType) {
+      case "image":
+        await copyImageToClipboard(content);
+        break;
+
+      case "text":
+        await copyToClipboard(content);
+        break;
+    }
+
     setIsCopied(true);
   };
 
@@ -19,13 +29,16 @@ export function useCopyClipboard(copiedResetEffectDeps?: DependencyList) {
   };
 }
 
-async function copyToClipboard(text: string) {
-  const blob = await fetch(text).then((res) => res.blob());
+const copyImageToClipboard = async (imageUrl: string) => {
+  const blob = await fetch(imageUrl).then((res) => res.blob());
 
-  // await navigator.clipboard.writeText(text);
   await navigator.clipboard.write([
     new ClipboardItem({
       [blob.type]: blob,
     }),
   ]);
-}
+};
+
+const copyToClipboard = async (text: string) => {
+  await navigator.clipboard.writeText(text);
+};

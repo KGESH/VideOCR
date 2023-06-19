@@ -6,7 +6,20 @@ export default function App() {
     console.log("content view loaded");
   }, []);
 
-  useCapture();
+  const { isDrawing, rectangle } = useCapture();
 
-  return <div className="content-view">my content view2</div>;
+  return (
+    <div className="content-view">
+      {isDrawing && (
+        <div
+          style={{
+            position: "absolute",
+            border: "1px solid black",
+            background: "rgba(0, 0, 0, 0.1)",
+            ...rectangle,
+          }}
+        ></div>
+      )}
+    </div>
+  );
 }
