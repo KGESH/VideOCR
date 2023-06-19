@@ -1,5 +1,5 @@
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
-import { registerCaptureListener } from "@src/chrome/service/Capture";
+import {registerCaptureListener, registerDownloadListener} from "@src/chrome/service/Capture";
 import { registerShortCut } from "@src/chrome/service/ShortCut";
 
 reloadOnUpdate("pages/background");
@@ -27,5 +27,6 @@ chrome.runtime.onConnect.addListener((port) => {
 });
 
 registerCaptureListener();
+registerDownloadListener();
 
 registerShortCut();

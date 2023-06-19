@@ -4,6 +4,8 @@ import {
   CaptureRequest,
   CaptureResponse,
 } from "@src/chrome/types/Capture";
+import { DownloadRequest } from "@src/chrome/types/Download";
+import { saveImageFile } from "@src/chrome/service/Download";
 
 export const captureScreenShot = () => {
   const area: CaptureArea = { x: 0, y: 0, width: 100, height: 100 };
@@ -21,57 +23,40 @@ export const captureScreenShot = () => {
   );
 };
 
-export const saveImageFile = (dataUrl: string) => {
-  chrome.downloads.download(
-    {
-      filename: "image.png",
-      url: dataUrl,
-    },
-    (downloadId) => {
-      console.log("downloadId", downloadId);
+export const registerDownloadListener = () => {
+  chrome.runtime.onMessage.addListener((req: DownloadRequest) => {
+    if (req.type === "download") {
+      saveImageFile(req.dataUrl);
     }
-  );
+  });
+};
+
+const captureTab = async (req: CaptureRequest): Promise<CaptureResponse> => {
+  const tab = await getCurrentTab();
+  const image = await new Promise<string>((resolve, reject) => {
+    chrome.tabs.captureVisibleTab(
+      tab.windowId,
+      { format: "png" },
+      (capturedTab) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError.message);
+        } else {
+          resolve(capturedTab);
+        }
+      }
+    );
+  });
+
+  return { ...req, imageData: image };
 };
 
 export const registerCaptureListener = () => {
-  console.log("registerCaptureListener");
-
   chrome.runtime.onMessage.addListener(
-    async (req: CaptureRequest, sender, sendResponse) => {
-      console.log("captureMedia onMessage3: ", req);
-
+    (req: CaptureRequest, sender, sendResponse) => {
       if (req.type === "capture") {
-        const tab = await getCurrentTab();
-
-        const img = await new Promise<string>((resolve, reject) => {
-          chrome.tabs.captureVisibleTab(
-            tab.windowId,
-            { format: "png" },
-            (capturedTab) => {
-              if (chrome.runtime.lastError) {
-                reject(chrome.runtime.lastError.message);
-              } else {
-                resolve(capturedTab);
-              }
-            }
-          );
-        });
-
-        const res: CaptureResponse = {
-          ...req,
-          imageData: img,
-        };
-
-        console.log("==============captureMedia img2==============: ", res);
-        sendResponse(res);
-        return true;
-      } else {
-        console.log("ELSE", req);
+        captureTab(req).then(sendResponse);
       }
 
-      console.log("Failed to capture LOG");
-
-      sendResponse("Failed to capture");
       return true;
     }
   );

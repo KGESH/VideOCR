@@ -1,5 +1,9 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { CaptureRequest, CaptureResponse } from "@src/chrome/types/Capture";
+import { DownloadRequest } from "@src/chrome/types/Download";
+import { downloadFile } from "@src/chrome/service/Download";
+import { useCopyClipboard } from "@pages/content/hooks/useCopyClipboard";
 
 export const useCapture = () => {
   const [mouseDownX, setMouseDownX] = useState(0);
@@ -7,6 +11,7 @@ export const useCapture = () => {
   const [draggedWidth, setDraggedWidth] = useState(0);
   const [draggedHeight, setDraggedHeight] = useState(0);
   const [isDrawing, setIsDrawing] = useState(false);
+  const { copy, isCopied } = useCopyClipboard();
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
@@ -17,7 +22,6 @@ export const useCapture = () => {
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      // console.log("mousemove E", e.clientX, e.clientY);
       if (!isDrawing) return;
 
       setDraggedWidth(e.clientX - mouseDownX);
@@ -63,7 +67,13 @@ export const useCapture = () => {
             );
 
             const base64 = canvas.toDataURL("image/png");
-            console.log("base64: ", base64);
+
+            downloadFile({
+              type: "download",
+              dataUrl: base64,
+            });
+
+            copy(base64);
           };
 
           image.src = capturedTab;

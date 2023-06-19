@@ -1,5 +1,5 @@
 import { getCurrentTab } from "@src/chrome/service/Tab";
-import { saveImageFile } from "@src/chrome/service/Capture";
+import { downloadFile } from "@src/chrome/service/Download";
 
 export const registerShortCut = () => {
   console.log("registerShortCut");
@@ -16,7 +16,11 @@ export const registerShortCut = () => {
         { format: "png" },
         (image) => {
           console.log("image", image);
-          saveImageFile(image);
+
+          downloadFile({
+            type: "download",
+            dataUrl: image,
+          });
         }
       );
     }
