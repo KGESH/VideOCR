@@ -17,14 +17,10 @@ type StartPoint = {
 };
 
 export const useCapture = () => {
-  // const [mouseDownX, setMouseDownX] = useState(0);
-  // const [mouseDownY, setMouseDownY] = useState(0);
-  // const [draggedWidth, setDraggedWidth] = useState(0);
-  // const [draggedHeight, setDraggedHeight] = useState(0);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const { copy, isCopied } = useCopyClipboard();
   const [startPoint, setStartPoint] = useState<StartPoint>({ x: 0, y: 0 });
-  const [rectangle, setRectangle] = useState<Rectangle>({
+  const [draggedArea, setDraggedArea] = useState<Rectangle>({
     height: 0,
     left: 0,
     top: 0,
@@ -33,36 +29,24 @@ export const useCapture = () => {
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
-      console.log("mousedown E", e.clientX, e.clientY);
-      setIsDrawing(true);
-      // setMouseDownX(e.clientX);
-      // setMouseDownY(e.clientY);
+      setIsDragging(true);
+
       setStartPoint({
         x: e.clientX,
         y: e.clientY,
       });
 
-      setRectangle({
-        ...rectangle,
+      setDraggedArea({
+        ...draggedArea,
         left: e.clientX,
         top: e.clientY,
       });
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (!isDrawing) return;
+      if (!isDragging) return;
 
-      // setDraggedWidth(e.clientX - mouseDownX);
-      // setDraggedHeight(e.clientY - mouseDownY);
-      console.log("mousemove E", e.clientX, e.clientY);
-      const debugRectangle: Rectangle = {
-        width: Math.abs(e.clientX - startPoint.x),
-        height: Math.abs(e.clientY - startPoint.y),
-        left: e.clientX < startPoint.x ? e.clientX : startPoint.x,
-        top: e.clientY < startPoint.y ? e.clientY : startPoint.y,
-      };
-      console.log("debugRectangle", debugRectangle);
-      setRectangle({
+      setDraggedArea({
         width: Math.abs(e.clientX - startPoint.x),
         height: Math.abs(e.clientY - startPoint.y),
         left: e.clientX < startPoint.x ? e.clientX : startPoint.x,
@@ -71,32 +55,28 @@ export const useCapture = () => {
     };
 
     const onMouseUp = (e: MouseEvent) => {
-      // console.log(mouseDownX, mouseDownY, draggedWidth, draggedHeight);
-      setIsDrawing(false);
+      setIsDragging(false);
 
       const req: CaptureRequest = {
         type: "capture",
         area: {
-          x: rectangle.left,
-          y: rectangle.top,
-          width: rectangle.width,
-          height: rectangle.height,
+          x: draggedArea.left * devicePixelRatio,
+          y: draggedArea.top * devicePixelRatio,
+          width: draggedArea.width * devicePixelRatio,
+          height: draggedArea.height * devicePixelRatio,
         },
       };
-      console.log("mouseup E Request2", req);
 
       chrome.runtime.sendMessage(req, (res: CaptureResponse) => {
-        console.log("After Capture res: ", res);
         if (res.type === "capture") {
           const capturedTab = res.imageData;
           const image = new Image();
           const area = res.area;
-          console.log(`Received AREA: `, area);
 
           image.onload = () => {
             const canvas = document.createElement("canvas");
-            canvas.width = area.width;
-            canvas.height = area.height;
+            canvas.width = area.width / devicePixelRatio;
+            canvas.height = area.height / devicePixelRatio;
 
             const ctx = canvas.getContext("2d");
             ctx?.drawImage(
@@ -107,8 +87,8 @@ export const useCapture = () => {
               area.height,
               0,
               0,
-              area.width,
-              area.height
+              area.width / devicePixelRatio,
+              area.height / devicePixelRatio
             );
 
             const base64 = canvas.toDataURL("image/png");
@@ -135,7 +115,7 @@ export const useCapture = () => {
       document.removeEventListener("mousedown", onMouseDown);
       document.removeEventListener("mouseup", onMouseUp);
     };
-  }, [rectangle]);
+  }, [draggedArea]);
 
-  return { isDrawing, rectangle };
+  return { isDragging, draggedArea };
 };

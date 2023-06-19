@@ -6,17 +6,18 @@ export default function App() {
     console.log("content view loaded");
   }, []);
 
-  const { isDrawing, rectangle } = useCapture();
+  const { isDragging, draggedArea } = useCapture();
 
   return (
     <div className="content-view">
-      {isDrawing && (
+      {/** Show dragging area */}
+      {isDragging && (
         <div
           style={{
             position: "absolute",
             border: "1px solid black",
             background: "rgba(0, 0, 0, 0.1)",
-            ...rectangle,
+            ...draggedArea,
           }}
         ></div>
       )}
