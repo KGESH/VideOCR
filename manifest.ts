@@ -38,10 +38,18 @@ const manifest: chrome.runtime.ManifestV3 = {
     capture_screenshot: {
       suggested_key: {
         default: "Ctrl+Shift+Y",
-        windows: "Ctrl+Shift+K",
-        mac: "Command+Shift+S",
+        windows: "Ctrl+Shift+Y",
+        mac: "Command+Shift+Y",
       },
       description: "Capture screenshot short cut",
+    },
+    capture_mode: {
+      suggested_key: {
+        default: "Ctrl+Shift+K",
+        windows: "Ctrl+Shift+K",
+        mac: "Command+Shift+K",
+      },
+      description: "Capture mode enable short cut",
     },
   },
   web_accessible_resources: [

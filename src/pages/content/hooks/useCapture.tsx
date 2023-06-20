@@ -1,9 +1,9 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { CaptureRequest, CaptureResponse } from "@src/chrome/types/Capture";
-import { downloadFile } from "@src/chrome/service/Download";
 import { useCopyClipboard } from "@pages/content/hooks/useCopyClipboard";
 import { getTextFromImage } from "@src/ocr/Recognize";
+import { ChangeCursorRequest } from "@src/chrome/service/ShortCut";
 
 type Rectangle = {
   top: number;
@@ -18,6 +18,7 @@ type StartPoint = {
 };
 
 export const useCapture = () => {
+  const [isCaptureCursorActive, setIsCaptureCursorActive] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const { copyToClipboard, isCopied } = useCopyClipboard();
   const [startPoint, setStartPoint] = useState<StartPoint>({ x: 0, y: 0 });
@@ -29,7 +30,40 @@ export const useCapture = () => {
   });
 
   useEffect(() => {
+    const onMessageReceived = (req: ChangeCursorRequest) => {
+      if (req.type === "change_cursor") {
+        /** 캡처 커서 비활성화 */
+        if (isCaptureCursorActive) {
+          disableCaptureCursor(setIsCaptureCursorActive);
+
+          /** 캡처 커서 활성화 */
+        } else {
+          enableCaptureCursor(setIsCaptureCursorActive);
+        }
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(onMessageReceived);
+
+    return () => {
+      chrome.runtime.onMessage.removeListener(onMessageReceived);
+    };
+  }, [isCaptureCursorActive]);
+
+  useEffect(() => {
+    const onRightClick = (e: MouseEvent) => {
+      if (!isCaptureCursorActive) return;
+
+      e.preventDefault();
+
+      setIsDragging(false);
+
+      disableCaptureCursor(setIsCaptureCursorActive);
+    };
+
     const onMouseDown = (e: MouseEvent) => {
+      if (!isCaptureCursorActive) return;
+
       setIsDragging(true);
 
       setStartPoint({
@@ -45,7 +79,7 @@ export const useCapture = () => {
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
+      if (!isCaptureCursorActive || !isDragging) return;
 
       setDraggedArea({
         width: Math.abs(e.clientX - startPoint.x),
@@ -56,6 +90,8 @@ export const useCapture = () => {
     };
 
     const onMouseUp = (e: MouseEvent) => {
+      if (!isCaptureCursorActive) return;
+
       setIsDragging(false);
 
       const req: CaptureRequest = {
@@ -99,20 +135,55 @@ export const useCapture = () => {
           };
 
           image.src = capturedTab;
+
+          disableCaptureCursor(setIsCaptureCursorActive);
+
+          // reset states
+          setDraggedArea({
+            height: 0,
+            left: 0,
+            top: 0,
+            width: 0,
+          });
+
+          setStartPoint({
+            x: 0,
+            y: 0,
+          });
         }
       });
     };
 
+    document.addEventListener("contextmenu", onRightClick);
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mousedown", onMouseDown);
     document.addEventListener("mouseup", onMouseUp);
 
     return () => {
+      document.removeEventListener("contextmenu", onRightClick);
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mousedown", onMouseDown);
       document.removeEventListener("mouseup", onMouseUp);
     };
-  }, [draggedArea]);
+  }, [draggedArea, isCaptureCursorActive]);
 
-  return { isDragging, draggedArea };
+  return { isDragging, draggedArea, isCaptureCursorActive };
+};
+
+const disableCaptureCursor = (
+  setIsCaptureCursorActive: (
+    value: ((prevState: boolean) => boolean) | boolean
+  ) => void
+) => {
+  setIsCaptureCursorActive(false);
+  document.body.style.cursor = "default";
+};
+
+const enableCaptureCursor = (
+  setIsCaptureCursorActive: (
+    value: ((prevState: boolean) => boolean) | boolean
+  ) => void
+) => {
+  setIsCaptureCursorActive(true);
+  document.body.style.cursor = "wait";
 };

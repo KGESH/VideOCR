@@ -1,28 +1,51 @@
 import { getCurrentTab } from "@src/chrome/service/Tab";
 import { downloadFile } from "@src/chrome/service/Download";
 
-export const registerShortCut = () => {
+type CaptureMode = "capture_screenshot" | "capture_mode";
+
+export const registerShortCuts = () => {
   console.log("registerShortCut");
   chrome.commands.onCommand.addListener(async (command) => {
     console.log(`Command: ${command}`);
 
-    if (command === "capture_screenshot") {
-      console.log("capture-screenshot");
-      const tab = await getCurrentTab();
-      console.log(`background tab: `, tab);
+    switch (command) {
+      case "capture_screenshot":
+        await registerCaptureKey();
+        break;
 
-      chrome.tabs.captureVisibleTab(
-        tab.windowId,
-        { format: "png" },
-        (image) => {
-          console.log("image", image);
+      case "capture_mode":
+        await registerCaptureModeKey();
+        break;
 
-          downloadFile({
-            type: "download",
-            dataUrl: image,
-          });
-        }
-      );
+      default:
+        break;
     }
   });
+};
+
+const registerCaptureKey = async () => {
+  const tab = await getCurrentTab();
+  chrome.tabs.captureVisibleTab(tab.windowId, { format: "png" }, (image) => {
+    downloadFile({
+      type: "download",
+      dataUrl: image,
+    });
+  });
+};
+
+export type CursorMode = "capture" | "default";
+export type ChangeCursorRequest = {
+  type: "change_cursor";
+  mode: CursorMode;
+};
+
+const registerCaptureModeKey = async () => {
+  const tab = await getCurrentTab();
+
+  const req: ChangeCursorRequest = {
+    type: "change_cursor",
+    mode: "capture",
+  };
+
+  await chrome.tabs.sendMessage(tab.id!, req);
 };

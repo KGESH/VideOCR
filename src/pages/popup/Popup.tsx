@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import logo from "@assets/img/logo.svg";
 import "@pages/popup/Popup.css";
-import { captureScreenShot } from "@src/chrome/service/Capture";
 
 const Popup = () => {
   // const port = chrome.runtime.connect({ name: "popup" });
