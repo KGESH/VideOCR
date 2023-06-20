@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { CaptureRequest, CaptureResponse } from "@src/chrome/types/Capture";
 import { downloadFile } from "@src/chrome/service/Download";
 import { useCopyClipboard } from "@pages/content/hooks/useCopyClipboard";
+import { getTextFromImage } from "@src/ocr/Recognize";
 
 type Rectangle = {
   top: number;
@@ -18,7 +19,7 @@ type StartPoint = {
 
 export const useCapture = () => {
   const [isDragging, setIsDragging] = useState(false);
-  const { copy, isCopied } = useCopyClipboard();
+  const { copyToClipboard, isCopied } = useCopyClipboard();
   const [startPoint, setStartPoint] = useState<StartPoint>({ x: 0, y: 0 });
   const [draggedArea, setDraggedArea] = useState<Rectangle>({
     height: 0,
@@ -73,7 +74,7 @@ export const useCapture = () => {
           const image = new Image();
           const area = res.area;
 
-          image.onload = () => {
+          image.onload = async () => {
             const canvas = document.createElement("canvas");
             canvas.width = area.width / devicePixelRatio;
             canvas.height = area.height / devicePixelRatio;
@@ -92,13 +93,9 @@ export const useCapture = () => {
             );
 
             const base64 = canvas.toDataURL("image/png");
-
-            downloadFile({
-              type: "download",
-              dataUrl: base64,
-            });
-
-            copy(base64, "image");
+            const recognizedText = await getTextFromImage(base64);
+            await copyToClipboard(recognizedText, "text");
+            console.log(recognizedText);
           };
 
           image.src = capturedTab;

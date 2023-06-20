@@ -9,14 +9,14 @@ export function useCopyClipboard(copiedResetEffectDeps?: DependencyList) {
     setIsCopied(false);
   }, copiedResetEffectDeps);
 
-  const copy = async (content: string, contentType: ContentType) => {
+  const copyToClipboard = async (content: string, contentType: ContentType) => {
     switch (contentType) {
       case "image":
         await copyImageToClipboard(content);
         break;
 
       case "text":
-        await copyToClipboard(content);
+        await copyTextToClipboard(content);
         break;
     }
 
@@ -25,7 +25,7 @@ export function useCopyClipboard(copiedResetEffectDeps?: DependencyList) {
 
   return {
     isCopied,
-    copy,
+    copyToClipboard,
   };
 }
 
@@ -39,6 +39,6 @@ const copyImageToClipboard = async (imageUrl: string) => {
   ]);
 };
 
-const copyToClipboard = async (text: string) => {
+const copyTextToClipboard = async (text: string) => {
   await navigator.clipboard.writeText(text);
 };
