@@ -2,7 +2,9 @@ import { DependencyList, useEffect, useState } from "react";
 
 type ContentType = "image" | "text";
 
-export function useCopyClipboard(copiedResetEffectDeps?: DependencyList) {
+export type HandleCopyClipboard = (content: string, contentType: ContentType) => void;
+
+export const useCopyClipboard = (copiedResetEffectDeps?: DependencyList) => {
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export function useCopyClipboard(copiedResetEffectDeps?: DependencyList) {
     isCopied,
     copyToClipboard,
   };
-}
+};
 
 const copyImageToClipboard = async (imageUrl: string) => {
   const blob = await fetch(imageUrl).then((res) => res.blob());
@@ -40,5 +42,25 @@ const copyImageToClipboard = async (imageUrl: string) => {
 };
 
 const copyTextToClipboard = async (text: string) => {
-  await navigator.clipboard.writeText(text);
+  /** HTTPS 환경에 따라 분기 */
+  if (window.isSecureContext && navigator.clipboard) {
+    await navigator.clipboard.writeText(text);
+  } else {
+    unsecuredCopyTextToClipboard(text);
+  }
+};
+
+const unsecuredCopyTextToClipboard = (text: string) => {
+  console.log("unsecuredCopyTextToClipboard");
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    document.execCommand("copy");
+  } catch (err) {
+    console.error("Unable to copy to clipboard", err);
+  }
+  document.body.removeChild(textArea);
 };
