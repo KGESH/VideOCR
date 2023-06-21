@@ -4,6 +4,8 @@ import "@pages/popup/Popup.css";
 
 const Popup = () => {
   // const port = chrome.runtime.connect({ name: "popup" });
+  const openShortcutsTab = () =>
+    chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
 
   return (
     <div className="App">
@@ -14,7 +16,7 @@ const Popup = () => {
         </p>
       </header>
       <h1>Hello world!</h1>
-      <button>Capture</button>
+      <button onClick={openShortcutsTab}>Shortcuts</button>
     </div>
   );
 };
