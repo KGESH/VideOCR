@@ -1,6 +1,6 @@
 import { getCurrentTab } from "@src/chrome/service/Tab";
 import {
-  CaptureArea,
+  TabArea,
   CaptureRequest,
   CaptureResponse,
 } from "@src/chrome/types/Capture";
@@ -8,7 +8,7 @@ import { DownloadRequest } from "@src/chrome/types/Download";
 import { saveImageFile } from "@src/chrome/service/Download";
 
 export const captureScreenShot = () => {
-  const area: CaptureArea = { x: 0, y: 0, width: 100, height: 100 };
+  const area: TabArea = { x: 0, y: 0, width: 100, height: 100 };
 
   console.log(`Call captureScreenShot`);
   chrome.runtime.sendMessage(

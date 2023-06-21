@@ -1,6 +1,6 @@
 export type CaptureType = "capture";
 
-export type CaptureArea = {
+export type TabArea = {
   x: number;
   y: number;
   width: number;
@@ -9,7 +9,7 @@ export type CaptureArea = {
 
 export type CaptureRequest = {
   type: CaptureType;
-  area: CaptureArea;
+  area: TabArea;
 };
 
 export type CaptureResponse = CaptureRequest & {

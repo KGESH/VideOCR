@@ -1,11 +1,11 @@
-import { getCurrentTab } from "@src/chrome/service/Tab";
+import { getCurrentTab, sendMessageToCurrentTab } from "@src/chrome/service/Tab";
 import { downloadFile } from "@src/chrome/service/Download";
 
 type CaptureMode = "capture_screenshot" | "capture_mode";
 
 export const registerShortCuts = () => {
   console.log("registerShortCut");
-  chrome.commands.onCommand.addListener(async (command) => {
+  chrome.commands.onCommand.addListener(async (command: CaptureMode | string) => {
     console.log(`Command: ${command}`);
 
     switch (command) {
@@ -40,12 +40,10 @@ export type ChangeCursorRequest = {
 };
 
 const registerCaptureModeKey = async () => {
-  const tab = await getCurrentTab();
-
   const req: ChangeCursorRequest = {
     type: "change_cursor",
     mode: "capture",
   };
 
-  await chrome.tabs.sendMessage(tab.id!, req);
+  await sendMessageToCurrentTab(req);
 };
