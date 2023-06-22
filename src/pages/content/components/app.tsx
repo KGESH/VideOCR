@@ -1,5 +1,8 @@
 import { useCapture } from "@pages/content/hooks/useCapture";
 import { useEffect, useState } from "react";
+import { ResultModal } from "@pages/content/components/modal/ResultModal";
+import { CursorPos, useCursor } from "@pages/content/hooks/useCursor";
+import { DragArea } from "@pages/content/components/cursor/DragArea";
 
 export const useBlockSelectText = (isDragging: boolean) => {
   const [isSelectTextBlocking, setIsSelectTextBlocking] = useState(false);
@@ -18,21 +21,28 @@ export const useBlockSelectText = (isDragging: boolean) => {
 };
 
 export default function App() {
-  const { isDragging, draggedArea } = useCapture();
+  const { isDragging, draggedArea, isCopied } = useCapture();
   const { isSelectTextBlocking } = useBlockSelectText(isDragging);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalPos, setModalPos] = useState<CursorPos>({ x: 0, y: 0 });
+  const { cursorPos } = useCursor();
+
+  const showModal = () => {
+    setModalVisible(!modalVisible);
+    if (!modalVisible) setModalPos(cursorPos);
+  };
 
   return (
     <div className="content-view">
+      <button onClick={showModal}>Show Modal</button>
+
       {/** Show dragging area */}
-      {isDragging && (
-        <div
-          style={{
-            position: "fixed",
-            border: "1px solid black",
-            background: "rgba(0, 0, 0, 0.1)",
-            ...draggedArea,
-          }}
-        ></div>
+      {isDragging && <DragArea {...draggedArea} />}
+
+      {modalVisible && (
+        <ResultModal isCopied={isCopied} {...modalPos}>
+          <p>{`hello world!`}</p>
+        </ResultModal>
       )}
     </div>
   );

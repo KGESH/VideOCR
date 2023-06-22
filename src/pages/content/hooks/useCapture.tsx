@@ -9,7 +9,7 @@ import { CaptureArea, StartPoint } from "@pages/content/types/Capture";
 export const useCapture = () => {
   const [isCaptureEnabled, setIsCaptureEnabled] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const { copyToClipboard, isCopied } = useCopyClipboard();
+  const { copyToClipboard, isCopied } = useCopyClipboard([isDragging]);
   const [startPoint, setStartPoint] = useState<StartPoint>({ x: 0, y: 0 });
   const [draggedArea, setDraggedArea] = useState<CaptureArea>({
     height: 0,
@@ -42,5 +42,6 @@ export const useCapture = () => {
   return {
     isDragging,
     draggedArea,
+    isCopied,
   };
 };
