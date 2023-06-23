@@ -1,25 +1,15 @@
+import React from "react";
 import { useCapture } from "@pages/content/hooks/useCapture";
-import { useEffect, useState } from "react";
-
-export const useBlockSelectText = (isDragging: boolean) => {
-  const [isSelectTextBlocking, setIsSelectTextBlocking] = useState(false);
-
-  useEffect(() => {
-    if (isDragging) {
-      document.body.style.userSelect = "none";
-      setIsSelectTextBlocking(true);
-    } else {
-      document.body.style.userSelect = "";
-      setIsSelectTextBlocking(false);
-    }
-  }, [isDragging]);
-
-  return { isSelectTextBlocking };
-};
+import { useBlockSelectText } from "@pages/content/hooks/useBlockSelectText";
+import { ResultPanel } from "@pages/content/components/result-panel/ResultPanel";
+import { useMousePos } from "@pages/content/hooks/useMousePos";
 
 export default function App() {
-  const { isDragging, draggedArea } = useCapture();
+  const { isDragging, draggedArea, recognizedText } = useCapture();
   const { isSelectTextBlocking } = useBlockSelectText(isDragging);
+  const { mousePos } = useMousePos();
+
+  console.log("MOUSE POS", mousePos);
 
   return (
     <div className="content-view">
@@ -34,6 +24,7 @@ export default function App() {
           }}
         ></div>
       )}
+      {recognizedText && <ResultPanel recognizedText={recognizedText} mousePos={mousePos}></ResultPanel>}
     </div>
   );
 }

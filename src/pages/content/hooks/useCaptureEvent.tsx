@@ -1,5 +1,5 @@
 import { HandleCopyClipboard } from "@pages/content/hooks/useCopyClipboard";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CaptureRequest, CaptureResponse } from "@src/chrome/types/Capture";
 import { getTextFromImage } from "@src/ocr/Recognize";
 import {
@@ -27,7 +27,6 @@ type Props = {
   handleDraggedArea: HandleDraggedArea;
   startPoint: StartPoint;
   handleStartPoint: HandleStartPoint;
-  copyToClipboard: HandleCopyClipboard;
 };
 
 export const useCaptureEvent = ({
@@ -39,8 +38,9 @@ export const useCaptureEvent = ({
   handleDraggedArea,
   startPoint,
   handleStartPoint,
-  copyToClipboard,
 }: Props) => {
+  const [recognizedText, setRecognizedText] = useState<string>();
+
   useEffect(() => {
     /** 좌클릭 -> 캡처 시작 */
     const onMouseDown = (e: MouseEvent) => {
@@ -113,9 +113,10 @@ export const useCaptureEvent = ({
             );
 
             const base64 = canvas.toDataURL("image/png");
-            const recognizedText = await getTextFromImage(base64);
-            await copyToClipboard(recognizedText, "text");
-            console.log(recognizedText);
+            const recognized = await getTextFromImage(base64);
+            setRecognizedText(recognized);
+            // await copyToClipboard(recognizedText, "text");
+            // console.log(recognizedText);
           };
 
           image.src = capturedTab;
@@ -161,4 +162,6 @@ export const useCaptureEvent = ({
       document.removeEventListener("contextmenu", onRightClick);
     };
   }, [draggedArea, isCaptureEnabled]);
+
+  return { recognizedText };
 };

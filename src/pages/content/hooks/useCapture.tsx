@@ -9,7 +9,7 @@ import { CaptureArea, StartPoint } from "@pages/content/types/Capture";
 export const useCapture = () => {
   const [isCaptureEnabled, setIsCaptureEnabled] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const { copyToClipboard, isCopied } = useCopyClipboard();
+  const { isCopied, copyToClipboard } = useCopyClipboard();
   const [startPoint, setStartPoint] = useState<StartPoint>({ x: 0, y: 0 });
   const [draggedArea, setDraggedArea] = useState<CaptureArea>({
     height: 0,
@@ -25,7 +25,7 @@ export const useCapture = () => {
 
   useCursorEnabled(isCaptureEnabled, handleCaptureEnabled);
 
-  useCaptureEvent({
+  const { recognizedText } = useCaptureEvent({
     isCaptureEnabled,
     handleCaptureEnabled,
     isDragging,
@@ -34,13 +34,15 @@ export const useCapture = () => {
     handleDraggedArea,
     startPoint,
     handleStartPoint,
-    copyToClipboard,
   });
+
+  if (recognizedText) copyToClipboard(recognizedText, "text");
 
   useWaitForCopied(isCopied, handleCaptureEnabled);
 
   return {
     isDragging,
     draggedArea,
+    recognizedText,
   };
 };
