@@ -1,9 +1,6 @@
 import Tesseract from "tesseract.js";
 
-export const runOCR = async (
-  worker: Tesseract.Worker,
-  dataUrl: string
-): Promise<string> => {
+export const runOCR = async (worker: Tesseract.Worker, dataUrl: string): Promise<string> => {
   const {
     data: { text: recognizedText },
   } = await worker.recognize(dataUrl);
