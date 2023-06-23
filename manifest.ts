@@ -45,21 +45,16 @@ const manifest: chrome.runtime.ManifestV3 = {
     },
     capture_mode: {
       suggested_key: {
-        default: "Ctrl+Shift+K",
-        windows: "Ctrl+Shift+K",
-        mac: "Command+Shift+K",
+        default: "Ctrl+Shift+X",
+        windows: "Ctrl+Shift+X",
+        mac: "Command+Shift+X",
       },
       description: "Capture mode enable short cut",
     },
   },
   web_accessible_resources: [
     {
-      resources: [
-        "assets/js/*.js",
-        "assets/css/*.css",
-        "icon-128.png",
-        "icon-34.png",
-      ],
+      resources: ["assets/js/*.js", "assets/css/*.css", "icon-128.png", "icon-34.png"],
       matches: ["*://*/*"],
     },
   ],
