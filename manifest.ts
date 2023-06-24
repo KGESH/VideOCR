@@ -54,7 +54,7 @@ const manifest: chrome.runtime.ManifestV3 = {
   },
   web_accessible_resources: [
     {
-      resources: ["assets/js/*.js", "assets/css/*.css", "icon-128.png", "icon-34.png"],
+      resources: ["assets/js/*.js", "assets/css/*.css", "icon-128.png", "icon-34.png", "assets/js/*.wasm"],
       matches: ["*://*/*"],
     },
   ],

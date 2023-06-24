@@ -21,17 +21,17 @@ export default function makeManifest(
 
     // Naming change for cache invalidation
     if (config.contentScriptCssKey) {
+      // @ts-ignore
       manifest.content_scripts.forEach((script) => {
+        // @ts-ignore
         script.css = script.css.map((css) =>
+          // @ts-ignore
           css.replace("<KEY>", config.contentScriptCssKey)
         );
       });
     }
 
-    fs.writeFileSync(
-      manifestPath,
-      ManifestParser.convertManifestToString(manifest)
-    );
+    fs.writeFileSync(manifestPath, ManifestParser.convertManifestToString(manifest));
 
     colorLog(`Manifest file copy complete: ${manifestPath}`, "success");
   }

@@ -9,7 +9,12 @@ export const runOCR = async (worker: Tesseract.Worker, dataUrl: string): Promise
 };
 
 export const createWorker = async (): Promise<Tesseract.Worker> => {
-  const worker = await Tesseract.createWorker();
+  const worker = await Tesseract.createWorker({
+    corePath: chrome.runtime.getURL("assets/js/tesseract-core.wasm.js"),
+    workerPath: chrome.runtime.getURL("assets/js/worker.min.js"),
+    // corePath: "../../node_modules/tesseract.js-core/tesseract-core.wasm.js",
+    // workerPath: "../../node_modules/tesseract.js/dist/worker.min.js",
+  });
   await worker.load();
   await worker.loadLanguage("eng");
   await worker.initialize("eng");

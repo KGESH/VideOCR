@@ -6,6 +6,7 @@ import customDynamicImport from "./utils/plugins/custom-dynamic-import";
 import addHmr from "./utils/plugins/add-hmr";
 import manifest from "./manifest";
 
+const nodeModulesDir = resolve(__dirname, "node_modules");
 const root = resolve(__dirname, "src");
 const pagesDir = resolve(root, "pages");
 const assetsDir = resolve(root, "assets");
@@ -59,10 +60,9 @@ export default defineConfig({
       },
       output: {
         entryFileNames: "src/pages/[name]/index.js",
-        chunkFileNames: isDev
-          ? "assets/js/[name].js"
-          : "assets/js/[name].[hash].js",
+        chunkFileNames: isDev ? "assets/js/[name].js" : "assets/js/[name].[hash].js",
         assetFileNames: (assetInfo) => {
+          // @ts-ignore
           const { dir, name: _name } = path.parse(assetInfo.name);
           const assetFolder = dir.split("/").at(-1);
           const name = assetFolder + firstUpperCase(_name);
