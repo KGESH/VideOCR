@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Text, useClipboard, useDisclosure } from "@chakra-ui/react";
 import {
   Modal,
@@ -18,7 +18,7 @@ type Props = CaptureArea & {
   onClose: () => void;
 };
 
-export const ResultModal = ({ top, left, width, text, isOpen, onClose }: Props) => {
+export const ResultModal = ({ top, left, width, height, text, isOpen, onClose }: Props) => {
   const { onCopy, setValue, hasCopied } = useClipboard("");
 
   useEffect(() => {

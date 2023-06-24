@@ -8,12 +8,14 @@ import { useBlockSelectText } from "@pages/content/hooks/useBlockSelectText";
 import { CaptureArea } from "@pages/content/types/Capture";
 
 export default function App() {
-  const [recognizedDone, setRecognizedDone] = useState(false);
-  const handleRecognizedDone = (done: boolean) => setRecognizedDone(done);
+  // const [isRecognizing, setIsRecognizing] = useState(false);
+  // const [recognizedDone, setRecognizedDone] = useState(false);
+  // const handleRecognizing = (isProcessing: boolean) => setIsRecognizing(isProcessing);
+  // const handleRecognizedDone = (done: boolean) => setRecognizedDone(done);
   const [modalPos, setModalPos] = useState<CaptureArea>({ top: 0, left: 0, width: 0, height: 0 });
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const { isDragging, draggedArea, recognizedText } = useCapture({ recognizedDone, handleRecognizedDone });
+  const { isDragging, draggedArea, recognizedText, isRecognizing, recognizedDone } = useCapture();
   const { isSelectTextBlocking } = useBlockSelectText(isDragging);
 
   const showModal = () => {
@@ -31,9 +33,9 @@ export default function App() {
     <ChakraProvider>
       <div className="content-view">
         {/** Show dragging area */}
-        {isDragging && <DragArea {...draggedArea} />}
+        {isDragging && !isRecognizing && <DragArea {...draggedArea} />}
 
-        {recognizedDone && (
+        {recognizedDone && !isRecognizing && (
           <ResultModal isOpen={isOpen} onClose={onClose} text={recognizedText} {...modalPos}></ResultModal>
         )}
       </div>

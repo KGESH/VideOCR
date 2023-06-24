@@ -27,7 +27,10 @@ type Props = {
   handleDraggedArea: HandleDraggedArea;
   startPoint: StartPoint;
   handleStartPoint: HandleStartPoint;
-  handleRecognizedDone: (done: boolean) => void;
+  // recognizedDone: boolean;
+  // handleRecognizedDone: (done: boolean) => void;
+  // isRecognizing: boolean;
+  // handleRecognizing: (isProcessing: boolean) => void;
 };
 
 export const useCaptureEvent = ({
@@ -39,17 +42,24 @@ export const useCaptureEvent = ({
   handleDraggedArea,
   startPoint,
   handleStartPoint,
-  handleRecognizedDone,
 }: Props) => {
+  // recognizedDone,
+  // handleRecognizedDone,
+  // isRecognizing,
+  // handleRecognizing,
   const [recognizedText, setRecognizedText] = useState<string>("");
+  const [isRecognizing, setIsRecognizing] = useState(false);
+  const [recognizedDone, setRecognizedDone] = useState(true);
 
   useEffect(() => {
     /** 좌클릭 -> 캡처 시작 */
     const onMouseDown = (e: MouseEvent) => {
-      if (!isCaptureEnabled || e.button !== MOUSE_BUTTON.LEFT) return;
+      if (!isCaptureEnabled || isRecognizing || e.button !== MOUSE_BUTTON.LEFT) return;
 
       handleIsDragging(true);
-      handleRecognizedDone(false);
+      // handleRecognizedDone(false);
+      setRecognizedDone(false);
+      setIsRecognizing(true);
 
       handleStartPoint({
         x: e.clientX,
@@ -65,7 +75,7 @@ export const useCaptureEvent = ({
 
     /** 클릭중 */
     const onMouseMove = (e: MouseEvent) => {
-      if (!isCaptureEnabled || !isDragging || e.button !== MOUSE_BUTTON.LEFT) return;
+      if (!isCaptureEnabled || isRecognizing || !isDragging || e.button !== MOUSE_BUTTON.LEFT) return;
 
       handleDraggedArea({
         width: Math.abs(e.clientX - startPoint.x),
@@ -118,7 +128,9 @@ export const useCaptureEvent = ({
             const base64 = canvas.toDataURL("image/png");
             const recognized = await getTextFromImage(base64);
             setRecognizedText(recognized);
-            handleRecognizedDone(true);
+            setRecognizedDone(true);
+            setIsRecognizing(false);
+            // handleRecognizedDone(true);
           };
 
           image.src = capturedTab;
@@ -165,5 +177,5 @@ export const useCaptureEvent = ({
     };
   }, [draggedArea, isCaptureEnabled]);
 
-  return { recognizedText };
+  return { recognizedText, isRecognizing, recognizedDone };
 };

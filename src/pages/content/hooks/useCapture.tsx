@@ -9,7 +9,12 @@ type Props = {
   recognizedDone: boolean;
   handleRecognizedDone: (done: boolean) => void;
 };
-export const useCapture = ({ recognizedDone, handleRecognizedDone }: Props) => {
+export const useCapture = () => {
+  // const [isRecognizing, setIsRecognizing] = useState(false);
+  // const [recognizedDone, setRecognizedDone] = useState(false);
+  // const handleRecognizing = (isProcessing: boolean) => setIsRecognizing(isProcessing);
+  // const handleRecognizedDone = (done: boolean) => setRecognizedDone(done);
+
   const [isCaptureEnabled, setIsCaptureEnabled] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startPoint, setStartPoint] = useState<StartPoint>({ x: 0, y: 0 });
@@ -27,7 +32,7 @@ export const useCapture = ({ recognizedDone, handleRecognizedDone }: Props) => {
 
   useCursorEnabled(isCaptureEnabled, handleCaptureEnabled);
 
-  const { recognizedText } = useCaptureEvent({
+  const { recognizedText, isRecognizing, recognizedDone } = useCaptureEvent({
     isCaptureEnabled,
     handleCaptureEnabled,
     isDragging,
@@ -36,8 +41,11 @@ export const useCapture = ({ recognizedDone, handleRecognizedDone }: Props) => {
     handleDraggedArea,
     startPoint,
     handleStartPoint,
-    handleRecognizedDone,
   });
+  // recognizedDone,
+  // handleRecognizedDone,
+  // isRecognizing,
+  // handleRecognizing,
 
   useWaitForRecognized(recognizedDone, handleCaptureEnabled);
 
@@ -45,5 +53,7 @@ export const useCapture = ({ recognizedDone, handleRecognizedDone }: Props) => {
     isDragging,
     draggedArea,
     recognizedText,
+    isRecognizing,
+    recognizedDone,
   };
 };
