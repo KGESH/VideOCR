@@ -1,15 +1,17 @@
 import React from "react";
 import { useState } from "react";
-import { useCopyClipboard } from "@pages/content/hooks/useCopyClipboard";
-import { useWaitForCopied } from "@pages/content/hooks/useWaitForCopied";
+import { useWaitForRecognized } from "@pages/content/hooks/useWaitForRecognized";
 import { useCursorEnabled } from "@pages/content/hooks/useCursorEnabled";
 import { useCaptureEvent } from "@pages/content/hooks/useCaptureEvent";
 import { CaptureArea, StartPoint } from "@pages/content/types/Capture";
 
-export const useCapture = () => {
+type Props = {
+  recognizedDone: boolean;
+  handleRecognizedDone: (done: boolean) => void;
+};
+export const useCapture = ({ recognizedDone, handleRecognizedDone }: Props) => {
   const [isCaptureEnabled, setIsCaptureEnabled] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const { copyToClipboard, isCopied } = useCopyClipboard([isDragging]);
   const [startPoint, setStartPoint] = useState<StartPoint>({ x: 0, y: 0 });
   const [draggedArea, setDraggedArea] = useState<CaptureArea>({
     height: 0,
@@ -34,14 +36,14 @@ export const useCapture = () => {
     handleDraggedArea,
     startPoint,
     handleStartPoint,
+    handleRecognizedDone,
   });
 
-  useWaitForCopied(isCopied, handleCaptureEnabled);
+  useWaitForRecognized(recognizedDone, handleCaptureEnabled);
 
   return {
     isDragging,
     draggedArea,
-    isCopied,
     recognizedText,
   };
 };

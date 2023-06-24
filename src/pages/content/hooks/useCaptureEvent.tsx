@@ -27,6 +27,7 @@ type Props = {
   handleDraggedArea: HandleDraggedArea;
   startPoint: StartPoint;
   handleStartPoint: HandleStartPoint;
+  handleRecognizedDone: (done: boolean) => void;
 };
 
 export const useCaptureEvent = ({
@@ -38,8 +39,9 @@ export const useCaptureEvent = ({
   handleDraggedArea,
   startPoint,
   handleStartPoint,
+  handleRecognizedDone,
 }: Props) => {
-  const [recognizedText, setRecognizedText] = useState<string>();
+  const [recognizedText, setRecognizedText] = useState<string>("");
 
   useEffect(() => {
     /** 좌클릭 -> 캡처 시작 */
@@ -47,6 +49,7 @@ export const useCaptureEvent = ({
       if (!isCaptureEnabled || e.button !== MOUSE_BUTTON.LEFT) return;
 
       handleIsDragging(true);
+      handleRecognizedDone(false);
 
       handleStartPoint({
         x: e.clientX,
@@ -115,24 +118,23 @@ export const useCaptureEvent = ({
             const base64 = canvas.toDataURL("image/png");
             const recognized = await getTextFromImage(base64);
             setRecognizedText(recognized);
-            // await copyToClipboard(recognizedText, "text");
-            // console.log(recognizedText);
+            handleRecognizedDone(true);
           };
 
           image.src = capturedTab;
 
           // reset states
-          handleDraggedArea({
-            height: 0,
-            left: 0,
-            top: 0,
-            width: 0,
-          });
-
-          handleStartPoint({
-            x: 0,
-            y: 0,
-          });
+          // handleDraggedArea({
+          //   height: 0,
+          //   left: 0,
+          //   top: 0,
+          //   width: 0,
+          // });
+          //
+          // handleStartPoint({
+          //   x: 0,
+          //   y: 0,
+          // });
 
           changeCaptureCursor(handleCaptureEnabled, "wait");
         }

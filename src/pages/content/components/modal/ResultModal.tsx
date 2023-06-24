@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Button, Text, useClipboard, useDisclosure } from "@chakra-ui/react";
 import {
   Modal,
@@ -9,18 +9,16 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
-import { CursorPos, useCursor } from "@pages/content/hooks/useCursor";
 import { CopyIcon, SettingsIcon } from "@chakra-ui/icons";
+import { CaptureArea } from "@pages/content/types/Capture";
 
-type Props = {
-  x: number;
-  y: number;
+type Props = CaptureArea & {
   text: string;
   isOpen: boolean;
   onClose: () => void;
 };
 
-export const MyModal = ({ x, y, text, isOpen, onClose }: Props) => {
+export const ResultModal = ({ top, left, width, text, isOpen, onClose }: Props) => {
   const { onCopy, setValue, hasCopied } = useClipboard("");
 
   useEffect(() => {
@@ -28,48 +26,23 @@ export const MyModal = ({ x, y, text, isOpen, onClose }: Props) => {
   }, [text]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} blockScrollOnMount={false} scrollBehavior={"inside"}>
       {/*<ModalOverlay />*/}
-      <ModalContent left={x} top={y}>
+      <ModalContent position={"fixed"} left={left + width} top={top}>
         <ModalHeader>Recognized</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text fontSize={"sm"}>{text}</Text>
         </ModalBody>
         <ModalFooter>
+          <Button leftIcon={<CopyIcon />} onClick={onCopy} colorScheme="blue" mr={3} autoFocus>
+            {hasCopied ? `Copied!` : `Copy`}
+          </Button>
           <Button leftIcon={<SettingsIcon />} colorScheme="gray" mr={3}>
             Settings
-          </Button>
-          <Button leftIcon={<CopyIcon />} onClick={onCopy} colorScheme="blue" mr={3}>
-            {hasCopied ? `Copied!` : `Copy`}
           </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
-  );
-};
-export const ResultModal = ({ x, y, text }: Props) => {
-  const { onCopy, value, setValue, hasCopied } = useClipboard("");
-
-  useEffect(() => {
-    setValue(text);
-  }, [text]);
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        zIndex: 9999,
-        // display: visible ? "block" : "none",
-        top: y - 100,
-        left: x + 100,
-        backgroundColor: "gainsboro",
-      }}
-    >
-      <Button onClick={onCopy}>{hasCopied ? `Copied!` : `Copy`}</Button>
-      <p>{text}</p>
-      <p>==================</p>
-      <p>{value}</p>
-    </div>
   );
 };

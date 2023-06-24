@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { HandleCaptureEnabled } from "@pages/content/types/Capture";
 import { changeCaptureCursor } from "@pages/content/components/cursor/ChangeCursor";
 
-export const useWaitForCopied = (isCopied: boolean, handleCaptureEnabled: HandleCaptureEnabled) => {
+export const useWaitForRecognized = (recognizedDone: boolean, handleCaptureEnabled: HandleCaptureEnabled) => {
   useEffect(() => {
-    if (isCopied) changeCaptureCursor(handleCaptureEnabled, "default");
-  }, [isCopied]);
+    if (recognizedDone) changeCaptureCursor(handleCaptureEnabled, "default");
+  }, [recognizedDone]);
 };
